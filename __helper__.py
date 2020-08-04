@@ -1,6 +1,9 @@
 import cv2
 
-CAM_IDX = 1
+CAM_IDX = 0
+
+SENSITIVITY = 15
+CHECK_AFTER_EVERY = 1
 
 RED    = (0, 0, 255)
 BLUE   = (255, 0, 0,)
@@ -32,6 +35,27 @@ def show_direction(frame, coords):
     elif x <= rr and y <= h:  return 8 # S
     elif x <= w  and y <= h:  return 9 # SE
     else: return 5 # Null
+
+
+def check_direction(cur_position, prev_position, last_direction):
+    x1, y1 = cur_position
+    x2, y2 = prev_position
+
+    direction = 0 # Do Nothing
+
+    if   y2 - y1 >= SENSITIVITY: 
+        if last_direction != 2: direction = 2 # N
+    elif y1 - y2 >= SENSITIVITY:
+        if last_direction != 8: direction = 8 # S
+    
+    if   x1 - x2 >= SENSITIVITY:
+        if last_direction != 6: direction = 6 # E
+    elif x2 - x1 >= SENSITIVITY:
+        if last_direction != 4: direction = 4 # W
+
+    return direction
+
+
 
 
 def draw_point(frame, coords, radius=2, color=(255, 255, 255)):

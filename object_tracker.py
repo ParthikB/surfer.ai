@@ -27,10 +27,13 @@ print("[INFO] starting video stream...")
 vs = VideoStream(src=CAM_IDX).start()
 time.sleep(2.0)
 
-centre_coords = []
+position = []
+last_position = (0, 0)
+q = -1
 
 while True:
     frame = vs.read()
+    q += 1
     frame = cv2.flip(frame, 1)
     frame = imutils.resize(frame, width=400)
 
@@ -57,12 +60,17 @@ while True:
             area    = pow(diagnol, 2)
             # print(detections[0, 0, i, 3:7], area)
 
-            centre_coords.append(((startX+endX)//2, (startY+endY)//2))
-            centre_coords = centre_coords[-2:]
+    # position.append(((startX+endX)//2, (startY+endY)//2))
+    # position = position[-CHECK_AFTER_EVERY:]
+            cur_position = ((startX+endX)//2, (startY+endY)//2)
             
 # ####
-#             direction = show_direction(frame, centre_coords[-1])
-#             game_utils.move_uni(direction)
+            if q % CHECK_AFTER_EVERY == 0:
+                # direction = check_direction(position[-1], position[0], direction)
+                direction = check_direction(cur_position, last_position, direction)
+
+                game_utils.move_uni(direction)
+                last_position = cur_position
 # ####
     
     objects = ct.update(rects)
@@ -77,6 +85,8 @@ while True:
 #     frame = show(frame, direction)
 #     print(direction, random.random())
 # ####
+
+
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 

@@ -60,3 +60,32 @@ def move_uni(direction):
 
 
 
+def move_uni(direction):
+    
+    if direction == 0: return False # Do Nothing
+
+    press = 'z' # Dummy
+
+    w = Key.up
+    s = Key.down
+    a = Key.left
+    d = Key.right
+
+    
+
+    # if   direction == 1: press = 'wa' 
+    if   direction == 2: press = w
+    # elif direction == 3: press = 'wd'
+    elif direction == 4: press = a
+    elif direction == 6: press = d
+    # elif direction == 7: press = 'sa'
+    elif direction == 8: press = s
+    # elif direction == 9: press = 'sd'
+
+    import random
+    print(press, random.random())
+
+    keyboard = Controller()
+    # keyboard.type(press)
+    keyboard.press(press)
+    keyboard.release(press)
