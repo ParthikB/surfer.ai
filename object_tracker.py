@@ -29,11 +29,14 @@ time.sleep(2.0)
 
 position = []
 last_position = (0, 0)
+direction = 0
+
 q = -1
 
 while True:
     frame = vs.read()
     q += 1
+
     frame = cv2.flip(frame, 1)
     frame = imutils.resize(frame, width=400)
 
@@ -44,13 +47,11 @@ while True:
     net.setInput(blob)
     detections = net.forward()
     rects = []
-    direction = 5
-    # print(detections)
 
     for i in range(0, detections.shape[2]):
+
         if detections[0, 0, i, 2] > args['confidence']:
             box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
-            # print()
             rects.append(box.astype("int"))
 
             (startX, startY, endX, endY) = box.astype("int")
@@ -58,19 +59,17 @@ while True:
 
             diagnol = pow((startX-endX)**2 + (startY-endY)**2, 0.5)
             area    = pow(diagnol, 2)
-            # print(detections[0, 0, i, 3:7], area)
-
-    # position.append(((startX+endX)//2, (startY+endY)//2))
-    # position = position[-CHECK_AFTER_EVERY:]
             cur_position = ((startX+endX)//2, (startY+endY)//2)
             
 # ####
-            if q % CHECK_AFTER_EVERY == 0:
-                # direction = check_direction(position[-1], position[0], direction)
-                direction = check_direction(cur_position, last_position, direction)
 
-                game_utils.move_uni(direction)
-                last_position = cur_position
+    if q % CHECK_AFTER_EVERY == 0:
+        last_direction = direction
+        direction = check_direction(frame, cur_position, last_position, direction)
+
+        print(direction, last_direction)
+        game_utils.move_uni(direction, last_direction)
+        last_position = cur_position
 # ####
     
     objects = ct.update(rects)
@@ -81,9 +80,7 @@ while True:
         cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 # ####
-#     import random
-#     frame = show(frame, direction)
-#     print(direction, random.random())
+    frame = show(frame, direction, text_only=False)
 # ####
 
 
