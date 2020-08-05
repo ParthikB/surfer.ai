@@ -48,6 +48,7 @@ while True:
     detections = net.forward()
     rects = []
 
+    cur_position = None
     for i in range(0, detections.shape[2]):
 
         if detections[0, 0, i, 2] > args['confidence']:
@@ -62,14 +63,14 @@ while True:
             cur_position = ((startX+endX)//2, (startY+endY)//2)
             
 # ####
+    if cur_position: # If Something is detected
+        if q % CHECK_AFTER_EVERY == 0:
+            last_direction = direction
+            direction = check_direction(frame, cur_position, last_position, direction)
 
-    if q % CHECK_AFTER_EVERY == 0:
-        last_direction = direction
-        direction = check_direction(frame, cur_position, last_position, direction)
-
-        print(direction, last_direction)
-        game_utils.move_uni(direction, last_direction)
-        last_position = cur_position
+            print(direction, last_direction)
+            game_utils.move_uni(direction, last_direction)
+            last_position = cur_position
 # ####
     
     objects = ct.update(rects)
@@ -80,7 +81,7 @@ while True:
         cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 # ####
-    frame = show(frame, direction, text_only=False)
+    frame = show(frame, direction, text_only=True)
 # ####
 
 

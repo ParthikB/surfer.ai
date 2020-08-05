@@ -1,8 +1,8 @@
 import cv2
 
 CAM_IDX 		  = 0
-SENSITIVITY 	  = 15 # 0-100
-CHECK_AFTER_EVERY = 2  # Min 1
+SENSITIVITY 	  = 25 # 0-100
+CHECK_AFTER_EVERY = 3  # Min 1
 ALPHA  			  = 0.25 
 
 
@@ -18,27 +18,32 @@ def check_direction(frame, cur_position, prev_position, last_direction):
     x1, y1 = cur_position
     x2, y2 = prev_position
 
-    direction = -1 # Do Nothing
+    direction = 0 # Do Nothing
 
     # SENSITIVITY = 101 - SENSITIVITY
 
-    # if   y2 - y1 >= SENSITIVITY: 
+    # STATIC Directions
+    # if y1 < (2*h)//5:
     #     if last_direction != 2: direction = 2 # N
-    # elif y1 - y2 >= SENSITIVITY:
+    # elif y1 > (3*h)//5:
     #     if last_direction != 8: direction = 8 # S
+    # else: direction = 0
+
     
-    if y1 < (2*h)//5:
-        if last_direction != 2: direction = 2 # N
-    elif y1 > (3*h)//5:
-        if last_direction != 8: direction = 8 # N
-    else: direction = 0
+    # DYNAMIC Directions
+    if   y2 - y1 >= SENSITIVITY: direction = 2
+        # if last_direction != 2: direction = 2 # N
+    elif y1 - y2 >= SENSITIVITY: direction = 8
+        # if last_direction != 8: direction = 8 # S
+    
 
-    if   x1 - x2 >= SENSITIVITY:
-        if last_direction != 6: direction = 6 # E
-    elif x2 - x1 >= SENSITIVITY:
-        if last_direction != 4: direction = 4 # W
+    if   x1 - x2 >= SENSITIVITY: direction = 6
+        # if last_direction != 6: direction = 6 # E
+    elif x2 - x1 >= SENSITIVITY: direction = 4
+        # if last_direction != 4: direction = 4 # W
 
-    return direction if direction != -1 else last_direction
+    # return direction if direction else last_direction
+    return direction
 
 
  
