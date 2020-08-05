@@ -1,13 +1,9 @@
 from pyimagesearch.centroidtracker_mine import CentroidTracker
 from imutils.video import VideoStream
 import numpy as np
-import cv2
-import argparse
-import imutils
-import time
-import game_utils
+import cv2, argparse, imutils, time
 from __helper__ import *
-
+from PARAMETERS import *
 
 
 ap = argparse.ArgumentParser()
@@ -56,35 +52,38 @@ while True:
             rects.append(box.astype("int"))
 
             (startX, startY, endX, endY) = box.astype("int")
-            cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+            if SHOW_TRACKER: cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
 
             diagnol = pow((startX-endX)**2 + (startY-endY)**2, 0.5)
             area    = pow(diagnol, 2)
             cur_position = ((startX+endX)//2, (startY+endY)//2)
             
 # ####
-    if cur_position: # If Something is detected
+    objects = ct.update(rects)
+
+    if len(objects):  # If Something is detected
+        cur_position = objects[0]
+
         if q % CHECK_AFTER_EVERY == 0:
             last_direction = direction
             direction = check_direction(frame, cur_position, last_position, direction)
 
             print(direction, last_direction)
-            game_utils.move_uni(direction, last_direction)
+            move_uni(direction, last_direction)
             last_position = cur_position
 # ####
     
-    objects = ct.update(rects)
-    # print(len(objects), objects)
+    # objects = ct.update(rects)
 
-    for (objectID, centroid) in objects.items():
+    for idx, (objectID, centroid) in enumerate(objects.items()):
+        color = (0, 255, 0) if idx == 0 else (0, 0, 255)
+
         text = "ID {}".format(objectID)
-        cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
-# ####
-    frame = show(frame, direction, text_only=True)
-# ####
+        if SHOW_TRACKER:
+            cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv2.circle(frame, (centroid[0], centroid[1]), 4, color, -1)
 
-
+    frame = show(frame, direction)
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 
