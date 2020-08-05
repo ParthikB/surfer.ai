@@ -1,0 +1,7 @@
+CAM_IDX           = 1
+SENSITIVITY       = 75 # 0-99
+JUMP_SENSITIVITY  = 85 # 0-99
+SHOW_TRACKER      = True
+
+# LEAVE DEFAULT
+CHECK_AFTER_EVERY = 3  # Min 1
